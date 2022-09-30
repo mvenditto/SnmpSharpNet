@@ -97,7 +97,7 @@ namespace SnmpSharpNet
 			byte[] authKey = PasswordToKey(userPassword, engineId);
 			HMACSHA512 sha = new HMACSHA512(authKey);
 			byte[] hash = sha.ComputeHash(wholeMessage);
-			MutableByte myhash = new MutableByte(hash, 12);
+			MutableByte myhash = new MutableByte(hash, TruncatedDigestLength);
 			sha.Clear(); // release resources
 			if (myhash.Equals(authenticationParameters))
 			{
@@ -116,7 +116,7 @@ namespace SnmpSharpNet
 		{
 			HMACSHA512 sha = new HMACSHA512(authKey);
 			byte[] hash = sha.ComputeHash(wholeMessage);
-			MutableByte myhash = new MutableByte(hash, 12);
+			MutableByte myhash = new MutableByte(hash, TruncatedDigestLength);
 			sha.Clear(); // release resources
 			if (myhash.Equals(authenticationParameters))
 			{
