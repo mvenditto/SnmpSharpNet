@@ -47,17 +47,24 @@ namespace SnmpSharpNet
 		/// <see cref="AuthenticationDigests.None"/> is passed.</returns>
 		public static IAuthenticationDigest GetInstance(AuthenticationDigests authProtocol)
 		{
-			if (authProtocol == AuthenticationDigests.MD5)
-				return new AuthenticationMD5();
-			else if (authProtocol == AuthenticationDigests.SHA1)
-				return new AuthenticationSHA1();
-			return null;
-		}
-		/// <summary>
-		/// Constructor. Private to prevent the class from being instantiated.
-		/// </summary>
-		private Authentication()
+            switch (authProtocol)
+            {
+                case AuthenticationDigests.MD5:
+					return new AuthenticationMD5();
+				case AuthenticationDigests.SHA1:
+					return new AuthenticationSHA1();
+				case AuthenticationDigests.SHA512:
+                    return new AuthenticationSHA512();
+				case AuthenticationDigests.None:
+				default:
+					return null;
+			}
+        }
+        /// <summary>
+        /// Constructor. Private to prevent the class from being instantiated.
+        /// </summary>
+        private Authentication()
 		{
 		}
-	}
+    }
 }
