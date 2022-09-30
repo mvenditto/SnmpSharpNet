@@ -537,8 +537,10 @@ namespace SnmpSharpNet
 			// Authenticate message if authentication flag is set and packet is not a discovery packet
 			if (_msgFlags.Authentication && _userSecurityModel.EngineId.Length > 0)
 			{
+				var usmDigestSize = Authentication.GetTruncatedDigestSize(_userSecurityModel.Authentication);
+
 				// Authenticate packet
-				if (_userSecurityModel.AuthenticationParameters.Length != 12)
+				if (_userSecurityModel.AuthenticationParameters.Length != usmDigestSize.TruncatedDigestLength)
 					throw new SnmpAuthenticationException("Invalid authentication parameter field length.");
 				if (!_userSecurityModel.IsAuthentic(authKey, buffer))
 					throw new SnmpAuthenticationException("Authentication of the incoming packet failed.");

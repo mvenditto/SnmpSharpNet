@@ -60,6 +60,29 @@ namespace SnmpSharpNet
 					return null;
 			}
         }
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="authProtocol"></param>
+		/// <returns></returns>
+		public static int GetTruncatedDigestSize(AuthenticationDigests authProtocol)
+        {
+			// TODO: this information is also expoded by IAuthenticationDigest,
+			// maybe can be refactored ?
+			switch (authProtocol)
+			{
+				case AuthenticationDigests.MD5:
+				case AuthenticationDigests.SHA1:
+					return 12;
+				case AuthenticationDigests.SHA512:
+					return 48;
+				case AuthenticationDigests.None:
+				default:
+					return 0;
+			}
+		}
+
         /// <summary>
         /// Constructor. Private to prevent the class from being instantiated.
         /// </summary>
