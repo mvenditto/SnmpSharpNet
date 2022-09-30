@@ -292,19 +292,43 @@ namespace SnmpSharpNet
 			// encode engine time
 			_engineTime.encode(tmp);
 			_securityName.encode(tmp);
+			
 			if (_authentication != AuthenticationDigests.None)
 			{
-				if (_authenticationParameters.Length <= 0)
+                if (_authenticationParameters.Length <= 0)
 				{
-					// If authentication is used, set authentication parameters field to 12 bytes set to 0x00
-					_authenticationParameters.Set(new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 });
+					int digestSize = 12;
+
+					switch (_authentication)
+					{
+						case AuthenticationDigests.MD5:
+						case AuthenticationDigests.SHA1:
+							digestSize = 12;
+							break;
+						case AuthenticationDigests.SHA512:
+							digestSize = 48;
+							break;
+					}
+
+					var authParams = new byte[digestSize];
+
+					// probably not necessary ?
+					// If authentication is used, set authentication parameters field to {digestSize} bytes set to 0x00
+					for (var i = 0; i < authParams.Length; i++)
+                    {
+						authParams[i] = 0x00;
+                    }
+
+					_authenticationParameters.Set(authParams);
 				}
-			}
-			else
+            }
+            else
 			{
 				_authenticationParameters.Reset();
 			}
+
 			_authenticationParameters.encode(tmp);
+
 			if (_privacy != PrivacyProtocols.None)
 			{
 				if (_privacyParameters.Length <= 0)
@@ -336,17 +360,17 @@ namespace SnmpSharpNet
 			BuildHeader(buffer, OCTETSTRING, tmp1.Length);
 
 			buffer.Append(tmp1);
-		}
+        }
 
-		/// <summary>
-		/// Decode USM portion of the SNMP version 3 packet.
-		/// </summary>
-		/// <param name="buffer">Received SNMP packet BER encoded</param>
-		/// <param name="offset">Offset within the buffer to start decoding USM information</param>
-		/// <returns>Buffer position after the decoded value</returns>
-		/// <exception cref="SnmpDecodingException">Thrown when decoding enountered invalid data type in USM information</exception>
-		/// <exception cref="OverflowException">Thrown when packet is too small to contain information length specified in header</exception>
-		public override int decode(byte[] buffer, int offset)
+        /// <summary>
+        /// Decode USM portion of the SNMP version 3 packet.
+        /// </summary>
+        /// <param name="buffer">Received SNMP packet BER encoded</param>
+        /// <param name="offset">Offset within the buffer to start decoding USM information</param>
+        /// <returns>Buffer position after the decoded value</returns>
+        /// <exception cref="SnmpDecodingException">Thrown when decoding enountered invalid data type in USM information</exception>
+        /// <exception cref="OverflowException">Thrown when packet is too small to contain information length specified in header</exception>
+        public override int decode(byte[] buffer, int offset)
 		{
 			// Grab the octet string header
 			int len;
