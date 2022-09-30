@@ -31,6 +31,8 @@ namespace SnmpSharpNet
 		{
 		}
 
+		public int TruncatedDigestLength => 12;
+
 		/// <summary>
 		/// Authenticate packet and return authentication parameters value to the caller
 		/// </summary>

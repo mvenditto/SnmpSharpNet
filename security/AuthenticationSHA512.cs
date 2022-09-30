@@ -17,20 +17,28 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Security.Cryptography;
+using System.IO;
 
 namespace SnmpSharpNet
 {
 	/// <summary>
-	/// SHA-1 Authentication class.
+	/// SHA-512 Authentication class (usmHMAC384SHA512AuthProtocol)
+	/// rfc7630
 	/// </summary>
-	public class AuthenticationSHA1 : IAuthenticationDigest
+	public class AuthenticationSHA512 : IAuthenticationDigest
 	{
 		/// <summary>
 		/// Standard constructor.
 		/// </summary>
-		public AuthenticationSHA1()
+		public AuthenticationSHA512()
 		{
 		}
+
+		/// <summary>
+		/// rfc7630 4.1
+		/// </summary>
+		public int TruncatedDigestLength => 48;
+
 		/// <summary>
 		/// Authenticate packet and return authentication parameters value to the caller
 		/// </summary>
@@ -40,18 +48,19 @@ namespace SnmpSharpNet
 		/// <returns>Authentication parameters value</returns>
 		public byte[] authenticate(byte[] authenticationSecret, byte[] engineId, byte[] wholeMessage)
 		{
-			byte[] result = new byte[12];
+			byte[] result = new byte[TruncatedDigestLength];
 			byte[] authKey = PasswordToKey(authenticationSecret, engineId);
-			HMACSHA1 sha = new HMACSHA1(authKey);
-			byte[] hash = sha.ComputeHash(wholeMessage);
-			// copy 12 bytes of the hash into the wholeMessage
-			for (int i = 0; i < 12; i++)
+			var sha512 = new HMACSHA512(authKey);
+			byte[] hash = sha512.ComputeHash(wholeMessage);
+			// copy 48 bytes of the hash into the wholeMessage
+			for (int i = 0; i < TruncatedDigestLength; i++)
 			{
 				result[i] = hash[i];
 			}
-			sha.Clear(); // release resources
+			sha512.Clear(); // release resources
 			return result;
 		}
+
 		/// <summary>
 		/// Authenticate packet and return authentication parameters value to the caller
 		/// </summary>
@@ -60,18 +69,19 @@ namespace SnmpSharpNet
 		/// <returns>Authentication parameters value</returns>
 		public byte[] authenticate(byte[] authKey, byte[] wholeMessage)
 		{
-			byte[] result = new byte[12];
+			byte[] result = new byte[TruncatedDigestLength];
 
-			HMACSHA1 sha = new HMACSHA1(authKey);
-			byte[] hash = sha.ComputeHash(wholeMessage);
-			// copy 12 bytes of the hash into the wholeMessage
-			for (int i = 0; i < 12; i++)
+			var sha512 = new HMACSHA512(authKey);
+			byte[] hash = sha512.ComputeHash(wholeMessage);
+			// copy 48 bytes of the hash into the wholeMessage
+			for (int i = 0; i < TruncatedDigestLength; i++)
 			{
 				result[i] = hash[i];
 			}
-			sha.Clear(); // release resources
+			sha512.Clear(); // release resources
 			return result;
 		}
+
 		/// <summary>
 		/// Verifies correct SHA-1 authentication of the frame. Prior to calling this method, you have to extract authentication
 		/// parameters from the wholeMessage and reset authenticationParameters field in the USM information block to 12 0x00
@@ -85,7 +95,7 @@ namespace SnmpSharpNet
 		public bool authenticateIncomingMsg(byte[] userPassword, byte[] engineId, byte[] authenticationParameters, MutableByte wholeMessage)
 		{
 			byte[] authKey = PasswordToKey(userPassword, engineId);
-			HMACSHA1 sha = new HMACSHA1(authKey);
+			HMACSHA512 sha = new HMACSHA512(authKey);
 			byte[] hash = sha.ComputeHash(wholeMessage);
 			MutableByte myhash = new MutableByte(hash, 12);
 			sha.Clear(); // release resources
@@ -104,7 +114,7 @@ namespace SnmpSharpNet
 		/// <returns>True on authentication success, otherwise false</returns>
 		public bool authenticateIncomingMsg(byte[] authKey, byte[] authenticationParameters, MutableByte wholeMessage)
 		{
-			HMACSHA1 sha = new HMACSHA1(authKey);
+			HMACSHA512 sha = new HMACSHA512(authKey);
 			byte[] hash = sha.ComputeHash(wholeMessage);
 			MutableByte myhash = new MutableByte(hash, 12);
 			sha.Clear(); // release resources
@@ -123,13 +133,12 @@ namespace SnmpSharpNet
 		/// <exception cref="SnmpAuthenticationException">Thrown when key length is less then 8 bytes</exception>
 		public byte[] PasswordToKey(byte[] userPassword, byte[] engineID)
 		{
-			// key length has to be at least 8 bytes long (RFC3414)
 			if (userPassword == null || userPassword.Length < 8)
 				throw new SnmpAuthenticationException("Secret key is too short.");
 
 			int password_index = 0;
 			int count = 0;
-			SHA1 sha = new SHA1CryptoServiceProvider();
+			SHA512 sha = SHA512.Create();
 
 			/* Use while loop until we've done 1 Megabyte */
 			byte[] sourceBuffer = new byte[1048576];
@@ -162,7 +171,7 @@ namespace SnmpSharpNet
 		/// </summary>
 		public int DigestLength
 		{
-			get { return 20; }
+			get { return 64; }
 		}
 
 		/// <summary>
@@ -170,21 +179,18 @@ namespace SnmpSharpNet
 		/// </summary>
 		public string Name
 		{
-			get { return "HMAC-SHA1"; }
+			get { return "SHA-512 authentication provider"; }
 		}
-
-		public int TruncatedDigestLength => 12;
-
-        /// <summary>
-        /// Compute hash using authentication protocol.
-        /// </summary>
-        /// <param name="data">Data to hash</param>
-        /// <param name="offset">Compute hash from the source buffer offset</param>
-        /// <param name="count">Compute hash for source data length</param>
-        /// <returns>Hash value</returns>
-        public byte[] ComputeHash(byte[] data, int offset, int count)
+		/// <summary>
+		/// Compute hash using authentication protocol.
+		/// </summary>
+		/// <param name="data">Data to hash</param>
+		/// <param name="offset">Compute hash from the source buffer offset</param>
+		/// <param name="count">Compute hash for source data length</param>
+		/// <returns>Hash value</returns>
+		public byte[] ComputeHash(byte[] data, int offset, int count)
 		{
-			SHA1 sha = new SHA1CryptoServiceProvider();
+			SHA512 sha = new SHA512CryptoServiceProvider();
 			byte[] res = sha.ComputeHash(data, offset, count);
 			sha.Clear();
 			return res;

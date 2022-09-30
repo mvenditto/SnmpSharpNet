@@ -49,6 +49,13 @@ namespace SnmpSharpNet
 		}
 
 		/// <summary>
+		/// Returns the size of the truncated digest size. This value DOES represent the size of the digest
+		/// that is stored inside the USM authentication parameters header.
+		/// For SHA-2 algorithms refers to RFC7630 (4.1)
+		/// </summary>
+		int TruncatedDigestLength { get;  }
+
+		/// <summary>
 		/// Authenticate incoming messages
 		/// </summary>
 		/// <param name="authentiationSecret">Authentication user secret (password)</param>
