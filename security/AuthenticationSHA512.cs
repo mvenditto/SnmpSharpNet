@@ -181,6 +181,7 @@ namespace SnmpSharpNet
 		{
 			get { return "SHA-512 authentication provider"; }
 		}
+
 		/// <summary>
 		/// Compute hash using authentication protocol.
 		/// </summary>
@@ -190,7 +191,7 @@ namespace SnmpSharpNet
 		/// <returns>Hash value</returns>
 		public byte[] ComputeHash(byte[] data, int offset, int count)
 		{
-			SHA512 sha = new SHA512CryptoServiceProvider();
+			SHA512 sha = SHA512.Create();
 			byte[] res = sha.ComputeHash(data, offset, count);
 			sha.Clear();
 			return res;
