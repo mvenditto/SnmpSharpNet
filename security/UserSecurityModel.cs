@@ -297,18 +297,8 @@ namespace SnmpSharpNet
 			{
                 if (_authenticationParameters.Length <= 0)
 				{
-					int digestSize = 12;
-
-					switch (_authentication)
-					{
-						case AuthenticationDigests.MD5:
-						case AuthenticationDigests.SHA1:
-							digestSize = 12;
-							break;
-						case AuthenticationDigests.SHA512:
-							digestSize = 48;
-							break;
-					}
+					int digestSize = SnmpSharpNet.Authentication.GetTruncatedDigestSize(
+						_authentication);
 
 					var authParams = new byte[digestSize];
 

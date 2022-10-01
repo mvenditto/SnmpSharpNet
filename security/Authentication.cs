@@ -54,7 +54,9 @@ namespace SnmpSharpNet
 				case AuthenticationDigests.SHA1:
 					return new AuthenticationSHA1();
 				case AuthenticationDigests.SHA512:
-                    return new AuthenticationSHA512();
+				case AuthenticationDigests.SHA384:
+				case AuthenticationDigests.SHA256:
+					return new AuthenticationSHA2(authProtocol);
 				case AuthenticationDigests.None:
 				default:
 					return null;
@@ -62,7 +64,7 @@ namespace SnmpSharpNet
         }
 
 		/// <summary>
-		/// 
+		/// see rfc7630 (4.2 Processing)
 		/// </summary>
 		/// <param name="authProtocol"></param>
 		/// <returns></returns>
@@ -75,6 +77,10 @@ namespace SnmpSharpNet
 				case AuthenticationDigests.MD5:
 				case AuthenticationDigests.SHA1:
 					return 12;
+				case AuthenticationDigests.SHA256:
+					return 24;
+				case AuthenticationDigests.SHA384:
+					return 32;
 				case AuthenticationDigests.SHA512:
 					return 48;
 				case AuthenticationDigests.None:
