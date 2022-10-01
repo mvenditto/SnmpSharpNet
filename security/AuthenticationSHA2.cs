@@ -30,7 +30,7 @@ namespace SnmpSharpNet
 		/// <summary>
 		/// Length of the digest truncated to fit the auth parameters
 		/// </summary>
-		public int TruncatedDigestLength { get; private set; }
+		private int TruncatedDigestLength { get; set; }
 
 		/// <summary>
 		/// Return authentication protocol name

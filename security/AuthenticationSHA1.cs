@@ -173,8 +173,6 @@ namespace SnmpSharpNet
 			get { return "HMAC-SHA1"; }
 		}
 
-		public int TruncatedDigestLength => 12;
-
         /// <summary>
         /// Compute hash using authentication protocol.
         /// </summary>
