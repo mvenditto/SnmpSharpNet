@@ -70,8 +70,6 @@ namespace SnmpSharpNet
 		/// <returns></returns>
 		public static int GetTruncatedDigestSize(AuthenticationDigests authProtocol)
         {
-			// TODO: this information is also expoded by IAuthenticationDigest,
-			// maybe can be refactored ?
 			switch (authProtocol)
 			{
 				case AuthenticationDigests.MD5:

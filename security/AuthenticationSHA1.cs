@@ -173,14 +173,14 @@ namespace SnmpSharpNet
 			get { return "HMAC-SHA1"; }
 		}
 
-        /// <summary>
-        /// Compute hash using authentication protocol.
-        /// </summary>
-        /// <param name="data">Data to hash</param>
-        /// <param name="offset">Compute hash from the source buffer offset</param>
-        /// <param name="count">Compute hash for source data length</param>
-        /// <returns>Hash value</returns>
-        public byte[] ComputeHash(byte[] data, int offset, int count)
+		/// <summary>
+		/// Compute hash using authentication protocol.
+		/// </summary>
+		/// <param name="data">Data to hash</param>
+		/// <param name="offset">Compute hash from the source buffer offset</param>
+		/// <param name="count">Compute hash for source data length</param>
+		/// <returns>Hash value</returns>
+		public byte[] ComputeHash(byte[] data, int offset, int count)
 		{
 			SHA1 sha = new SHA1CryptoServiceProvider();
 			byte[] res = sha.ComputeHash(data, offset, count);
